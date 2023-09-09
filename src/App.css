@@ -31,7 +31,7 @@ tspan {
     background: white;
     padding: 15px;
     border-radius: 10px;
-    box-shadow: 0 .1rem .5rem #788AA3;
+    /*box-shadow: 0 .1rem .5rem #788AA3;*/
 }
 
 .data-section {
@@ -49,26 +49,6 @@ tspan {
     flex-direction: column;
     align-content: center;
     justify-content: center;
-}
-
-.Poll {
-    background-color: #282c34;
-    display: flex;
-    height: 100vh;
-    flex-direction: column;
-    color: white;
-    justify-content: center;
-    text-align: center;
-    align-items: center;
-}
-
-.Poll button {
-    width: auto;
-}
-
-.Poll input {
-    width: auto;
-    margin: 5px 20px 20px;
 }
 
 .Chart {
@@ -113,14 +93,13 @@ tspan {
 }
 
 .positives {
-    box-shadow: 0 .1rem .1rem #00910c,
-                0 .1rem 1rem rgba(0, 145, 12, 0.52);
+    box-shadow: 0 .1rem .1rem #6DA34D,
+    0 .1rem 1rem #6DA34D
 }
 
 .negatives {
     box-shadow: 0 .1rem .1rem #c0103d;
 }
-
 
 
 .dropdown-content::-webkit-scrollbar {
@@ -129,8 +108,8 @@ tspan {
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .dropdown-content {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
 }
 
 .dropdown-content {
@@ -147,6 +126,7 @@ tspan {
     transition: visibility .5s, max-height .5s;
     max-height: 0;
 }
+
 .DropdownElement:hover .dropdown-content {
     max-height: 234px;
     visibility: visible;

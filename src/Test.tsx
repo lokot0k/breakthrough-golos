@@ -5,6 +5,7 @@ import {Dropdown} from "./Dropdown";
 import {Sentiments} from "./utils";
 import {ParentSize} from "@visx/responsive";
 import {CustomWordCloud} from "./wordcloud";
+import {FormControlLabel, Radio, RadioGroup} from "@mui/material";
 
 
 interface LabeledData {
@@ -27,6 +28,7 @@ interface WordData {
 }
 
 export function Test() {
+    const [demoType, setDemoType] = useState("dd");
     const [question, setQuestion] = useState("Выберите файл...");
     const [data, setData] = useState({} as _.Dictionary<LabeledAnswer[]>);
     const [words, setWords] = useState([] as WordData[]);
@@ -51,17 +53,24 @@ export function Test() {
             <div className="chart-section">
                 <div className="question-holder">{question}</div>
                 <div className="data-section">
-                    {/*<Dropdown data={data}/>*/}
-                    {!_.isEmpty(data) ? (
-                        // @ts-ignore
-                        <ParentSize>{({ width, height }) => <CustomWordCloud width={width} height={height} data={data} />}</ParentSize>
-                    ) : <div/>}
+                    {
+                        "dd" === demoType ?
+                            <Dropdown data={data}/>
+                            : "wc" === demoType && !_.isEmpty(data) ?
+                                <ParentSize>{({width, height}) => <CustomWordCloud width={width} height={height}
+                                                                                   data={data}/>}</ParentSize>
+                            : <div/>
+                    }
                 </div>
             </div>
             <div className="qr-code-section">
                 <Form.Group controlId="formFile" className="mb-3">
                     <Form.Label>Default file input example</Form.Label>
                     <Form.Control type="file" onChange={handleFile}/>
+                    <RadioGroup value={demoType} defaultValue="dd" onChange={(event, value) => setDemoType(value)}>
+                        <FormControlLabel control={<Radio/>} label="Dropdown" value="dd"/>
+                        <FormControlLabel control={<Radio/>} label="Wordcloud" value="wc"/>
+                    </RadioGroup>
                 </Form.Group>
             </div>
         </div>
