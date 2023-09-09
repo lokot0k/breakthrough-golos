@@ -12,7 +12,7 @@ tspan {
 
 .header {
     background: white;
-    box-shadow: 0 .2rem .5rem #656565;
+    box-shadow: 0 .2rem .5rem #788AA3;
     height: 10vh;
     position: relative;
     z-index: 5;
@@ -31,11 +31,11 @@ tspan {
     background: white;
     padding: 15px;
     border-radius: 10px;
-    box-shadow: 0 .1rem .5rem #656565;
+    box-shadow: 0 .1rem .5rem #788AA3;
 }
 
 .data-section {
-    height: auto;
+    height: 60vh;
 }
 
 .chart-section {
@@ -102,7 +102,7 @@ tspan {
     background: #ffffff;
     border: white 2px solid;
     border-radius: 10px;
-    box-shadow: 0 .3rem .4rem #736e6e;
+    box-shadow: 0 .3rem .4rem #788AA3;
     padding: 10px;
     z-index: 5;
     height: 4rem;
@@ -135,8 +135,8 @@ tspan {
 
 .dropdown-content {
     width: 100%;
-    background-color: #b1b5b9;
-    box-shadow: 0 .1rem .2rem 0 rgba(0, 0, 0, 0.2);
+    background-color: #DAE0E7;
+    box-shadow: 0 .1rem .2rem 0 #788AA3;
     margin: -3px auto;
     overflow-y: scroll;
     z-index: 1;
