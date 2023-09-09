@@ -35,6 +35,7 @@ interface WordData {
     text: string;
     value: number;
 }
+let jsonTxt = "";
 
 export function Test() {
     const [censure, setCensure] = useState(false);
@@ -46,27 +47,41 @@ export function Test() {
     const [isLoading, setLoading] = useState(false)
     const [data, setData] = useState({} as _.Dictionary<LabeledAnswer[]>);
     const [words, setWords] = useState([] as WordData[]);
+
+    const makeRequest = async ()=>{
+        if(jsonTxt === ""){
+            return
+        }
+        setLoading(true)
+        console.log('{' + '"censure": '+ censure+", "+'"fast": '+fast+", "+'"data": ' + jsonTxt+'}')
+        const response = await fetch("/api/do_good/", {
+            method: "POST",
+            //mode: 'no-cors',
+            headers: {"Content-Type": "application/json"},
+            body: '{' + '"censure": '+ censure+", "+'"fast": '+fast+", "+'"data": ' + jsonTxt+'}'
+
+        })
+        if(!response.ok){
+            setLoading(false);
+            return;
+        }
+        const data: LabeledData = await response.json()
+        const clusters = _.groupBy(data.answers, 'cluster')
+        setData(clusters)
+        setQuestion(data.question)
+        setLoading(false)
+    }
     const handleFile: ChangeEventHandler<HTMLInputElement> = async event => {
         if (event.target.files && event.target.files.length) {
             const file = event.target.files[0]
-            setFilename(file.name)
-            setLoading(true)
             const text = await file.text();
-            const response = await fetch("/api/do_good/", {
-                method: "POST",
-                mode: 'no-cors',
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    censure,
-                    fast,
-                    data: JSON.parse(text)
-                })
-            })
-            const data: LabeledData = await response.json()
-            const clusters = _.groupBy(data.answers, 'cluster')
-            setData(clusters)
-            setQuestion(data.question)
-            setLoading(false)
+            if (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').
+            replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
+            replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+                setFilename(file.name)
+                jsonTxt = text;
+                await makeRequest();
+            }
         } else {
             setFilename("Загрузить файл")
         }
