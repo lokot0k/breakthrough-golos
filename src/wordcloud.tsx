@@ -40,8 +40,8 @@ export function CustomWordCloud({height, width, data}: { height: number, width: 
     });
     const fontSizeSetter = (datum: WordData) => fontScale(datum.value);
 
-    const positive_colors = ['#FFB140', '#FFC879', '#FFDFB0']
-    const neutrals_colors = ['#CBD2DB']
+    const positive_colors = ['#faa21c', '#f3a843', '#dca533']
+    const neutrals_colors = ['#626686']
     const negatives_colors = ['#69353F', '#9F6D77', '#D2ADB4']
     const color_dict: any = {};
     color_dict['positives'] = positive_colors;
