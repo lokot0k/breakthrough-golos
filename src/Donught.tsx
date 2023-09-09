@@ -22,13 +22,18 @@ export function DonughtStat({results}: { results: any }) {
     return <div className="Chart">
 
         <div style={{
-            height: 256,
-            width: 256
+            width: "60%",
+            height: "60%"
         }}>
             <Doughnut data={data} options={{
+                responsive: true,
                 plugins: {
                     legend: {
-                        display: false
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Распределение голосов по настроению'
                     }
                 }
             }}/>
