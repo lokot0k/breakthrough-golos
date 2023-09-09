@@ -39,6 +39,7 @@ interface WordData {
 export function Test() {
     const [censure, setCensure] = useState(false);
     const [fast, setFast] = useState(false);
+    const [correction, setCorrection] = useState(false);
     const [filename, setFilename] = useState("Загрузить файл");
     const [demoType, setDemoType] = useState("dd");
     const [question, setQuestion] = useState("Выберите файл...");
@@ -53,7 +54,7 @@ export function Test() {
             const text = await file.text();
             const response = await fetch("/api/do_good/", {
                 method: "POST",
-                //mode: 'no-cors',
+                mode: 'no-cors',
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({
                     censure,
@@ -74,7 +75,7 @@ export function Test() {
 
     return <div className="Test">
         <div className="header">
-            <img src={png} style={{ aspectRatio: "320/39", height:"50%", marginTop: "25px", marginLeft:"25px"}}></img>
+            <img src={png} style={{aspectRatio: "320/39", height: "50%", marginTop: "25px", marginLeft: "25px"}}></img>
             <Form.Group controlId="formFile" className="file-loader mb-3">
                 <Form.Label>{isLoading ? "Loading..." : filename}</Form.Label>
                 <Form.Control style={({
@@ -88,10 +89,10 @@ export function Test() {
                 <div className="data-section">
                     {
                         isLoading ?
-                            (<div className="progress-bar">
+                            (<div className="progress-bar-container"><div className="progress-bar">
                                 <div className="circle circle-border">
                                 </div>
-                            </div>)
+                            </div></div>)
                             :
                             ("dd" === demoType ?
                                 <Dropdown data={data}/>
@@ -105,17 +106,34 @@ export function Test() {
                     }
                 </div>
             </div>
-            <div className="qr-code-section">
-                <FormControlLabel value={censure} onChange={(event, checked) => setCensure(checked)} control={<Switch/>}
-                                  label={"Цензура"}/>
-                <FormControlLabel value={fast} onChange={(event, checked) => setFast(checked)} control={<Switch/>}
-                                  label={"Быстрее (но хуже)"}/>
-                <RadioGroup value={demoType} defaultValue="dd" onChange={(event, value) => setDemoType(value)}>
-                    <FormControlLabel control={<Radio/>} label={<img src={"/favicon.ico"}/>} value="dd"/>
-                    <FormControlLabel control={<Radio/>} label="Wordcloud" value="wc"/>
-                    <FormControlLabel control={<Radio/>} label="Hortizontal Chart" value="hc"/>
-                    <FormControlLabel control={<Radio/>} label="Donught" value="dn"/>
-                </RadioGroup>
+            <div className="settings-section">
+                <div className="settings-container">
+                    <h1>Отображение</h1>
+                    <FormControlLabel labelPlacement={"start"} value={censure}
+                                      onChange={(event, checked) => setCensure(checked)} control={<Switch/>}
+                                      label={"Цензура"}/>
+                    <br/>
+                    <FormControlLabel labelPlacement={"start"} value={fast}
+                                      onChange={(event, checked) => setFast(checked)}
+                                      control={<Switch/>}
+                                      label={"Быстрее (но хуже)"}/>
+                    <br/>
+                    <FormControlLabel labelPlacement={"start"} value={correction}
+                                      onChange={(event, checked) => setCorrection(checked)}
+                                      control={<Switch/>}
+                                      label={"Автокоррекция"}/>
+                    <RadioGroup className={"radio-demo-type-group"} value={demoType} defaultValue="dd"
+                                onChange={(event, value) => setDemoType(value)}>
+                        <FormControlLabel control={<Radio className={"radio-demo-type-button"}/>}
+                                          label={<img src={dropdown}/>} value="dd"/>
+                        <FormControlLabel control={<Radio className={"radio-demo-type-button"}/>}
+                                          label={<img src={wordCloud}/>} value="wc"/>
+                        <FormControlLabel control={<Radio className={"radio-demo-type-button"}/>}
+                                          label={<img src={horizontalChart}/>} value="hc"/>
+                        <FormControlLabel control={<Radio className={"radio-demo-type-button"}/>}
+                                          label={<img src={donught}/>} value="dn"/>
+                    </RadioGroup>
+                </div>
             </div>
         </div>
     </div>
