@@ -6,6 +6,7 @@ from django.views import View
 
 from sklearn.cluster import AgglomerativeClustering
 from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from transformers import GPT2Tokenizer, GPT2LMHeadModel, AutoTokenizer, \
     AutoModelForSequenceClassification, BertTokenizer, \
@@ -14,22 +15,31 @@ import math
 import torch
 
 from spellchecker import SpellChecker
-from fastDamerauLevenshtein import damerauLevenshtein
+
 
 class GarageModel:
     def __init__(self):
-        self.tokenizer_main = AutoTokenizer.from_pretrained('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
-        self.model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
-        self.cluster_model = AgglomerativeClustering(metric="cosine", linkage="average", n_clusters=None, distance_threshold=0.33)
+        self.tokenizer_main = AutoTokenizer.from_pretrained(
+            'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+        self.model = SentenceTransformer(
+            'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+        self.cluster_model = AgglomerativeClustering(metric="cosine",
+                                                     linkage="average",
+                                                     n_clusters=None,
+                                                     distance_threshold=0.33)
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
-        self.sent_tokenizer = AutoTokenizer.from_pretrained('cointegrated/rubert-tiny-sentiment-balanced')
-        self.sent_model = AutoModelForSequenceClassification.from_pretrained('cointegrated/rubert-tiny-sentiment-balanced')
+        self.sent_tokenizer = AutoTokenizer.from_pretrained(
+            'cointegrated/rubert-tiny-sentiment-balanced')
+        self.sent_model = AutoModelForSequenceClassification.from_pretrained(
+            'cointegrated/rubert-tiny-sentiment-balanced')
 
-
-        self.toxic_tokenizer = BertTokenizer.from_pretrained('SkolkovoInstitute/russian_toxicity_classifier')
-        self.toxic_model = BertForSequenceClassification.from_pretrained('SkolkovoInstitute/russian_toxicity_classifier')
+        self.toxic_tokenizer = BertTokenizer.from_pretrained(
+            'SkolkovoInstitute/russian_toxicity_classifier')
+        self.toxic_model = BertForSequenceClassification.from_pretrained(
+            'SkolkovoInstitute/russian_toxicity_classifier')
+        self.QA_model = SentenceTransformer('clips/mfaq')
 
         if torch.cuda.is_available():
             self.sent_model.cuda()
@@ -44,7 +54,6 @@ class GarageModel:
 
         self.spell = SpellChecker(language=['ru'])
 
-
     def correct(self, text):
         text_corr = ""
         for word in text.split():
@@ -55,19 +64,21 @@ class GarageModel:
         return text_corr
 
     def preprocess(self, text: str, censor=True, check_spelling=False):
-        txt = self.correct(self.clean(text)) if check_spelling else self.clean(text)
+        txt = self.correct(self.clean(text)) if check_spelling else self.clean(
+            text)
         if censor:
             if self.get_is_toxic(txt):
                 txt = "***"
         return txt
 
-
     def check_text(self, text):
+        return text
         text = self.clean(text.lower())
         corr_text = ""
         for word in text.split(' '):
             translit_word = self.replace_english_letters(word)
-            is_bad, similarity_ratio = self.is_bad_word(self.bad_words, translit_word)
+            is_bad, similarity_ratio = self.is_bad_word(self.bad_words,
+                                                        translit_word)
             if is_bad:
                 corr_text += "*" * len(word)
             else:
@@ -81,21 +92,22 @@ class GarageModel:
             text = text.replace(i, "")
         return text
 
-
     def get_sentiment(self, text):
         with torch.no_grad():
-            inputs = self.sent_tokenizer(text, return_tensors='pt', truncation=True, padding=True).to(self.sent_model.device)
-            proba = torch.sigmoid(self.sent_model(**inputs).logits).cpu().numpy()
+            inputs = self.sent_tokenizer(text, return_tensors='pt',
+                                         truncation=True, padding=True).to(
+                self.sent_model.device)
+            proba = torch.sigmoid(
+                self.sent_model(**inputs).logits).cpu().numpy()
         res = proba.dot([-1, 0, 1])
-        tresh = 0.33
-        res[res>tresh] = 1
-        res[res<-tresh] = -1
-        res[(res>=-tresh)*(res<=tresh)] = 0
+        res[res > 0.3] = 1
+        res[res < -0.5] = -1
+        res[(res >= -0.5) * (res <= 0.3)] = 0
         return res
 
     def get_is_toxic(self, text):
         batch = self.toxic_tokenizer.encode(text, return_tensors='pt')
-        return np.argmax(self.toxic_model(batch).logits.detach().numpy())==1
+        return np.argmax(self.toxic_model(batch).logits.detach().numpy()) == 1
 
     def replace_english_letters(self, text):
         replacements = {
@@ -118,14 +130,17 @@ class GarageModel:
 
         return text
 
-    def get_middlest_word(self, ans_emb, words): # для одного кластера
-        middle_point = ((ans_emb.sum(axis=0))/len(ans_emb)).reshape(1, -1)
-        dist = np.linalg.norm(ans_emb-middle_point, axis=1)
+    def get_middlest_word(self, ans_emb, words):  # для одного кластера
+        middle_point = ((ans_emb.sum(axis=0)) / len(ans_emb)).reshape(1, -1)
+        dist = np.linalg.norm(ans_emb - middle_point, axis=1)
         return words[np.argmin(dist)]
 
+    def get_more_obvious(self, quest_emb, ans_emb, words):
+        res = np.argmax(cosine_similarity([quest_emb], ans_emb))
+        return words[res]
 
     def read_json(self, parsed_json, censor=False, check_spelling=False,
-                  show_prints=False):
+                  show_prints=False, middlest_point=True):
         word2vec_model = self.model
         cluster_model = self.cluster_model
 
@@ -158,6 +173,11 @@ class GarageModel:
                 print("Embeddings.shape", embeddings.shape)
                 print(clusters_pred)
 
+            if not middlest_point:
+                embbbbb = self.QA_model.encode(
+                    np.hstack(np.array([[question], answers])))
+                embeddings = embbbbb[1:]
+
             df = pd.DataFrame({"answers": answers, "counts": counts,
                                "cluster": clusters_pred,
                                "sentiment": sentiment,
@@ -169,8 +189,13 @@ class GarageModel:
             for cluster in set(clusters_pred):
                 cluster_df = df[df["cluster"] == cluster]
                 temp_ditch = cluster_df.iloc[:, 5:].values
-                clus_word = self.get_middlest_word(temp_ditch, list(
-                    cluster_df.corrected.values))
+                if middlest_point:
+                    clus_word = self.get_middlest_word(temp_ditch, list(
+                        cluster_df.corrected.values))
+                else:
+                    clus_word = self.get_more_obvious(embbbbb[0], temp_ditch,
+                                                      list(
+                                                          cluster_df.corrected.values))
                 replacer[cluster] = clus_word
 
             df["cluster"].replace(replacer, inplace=True)
@@ -199,18 +224,21 @@ class GarageModel:
 gg = GarageModel()
 
 
-
 class MlView(View):
     def get(self, request: HttpRequest, *args,
             **kwargs) -> JsonResponse | HttpResponse:
-
         return JsonResponse(
             {'success': 'false', 'message': 'unsupported method'}, status=403)
 
     def post(self, request: HttpRequest, *args, **kwargs) -> JsonResponse:
         body = json.loads(request.body)
-        return JsonResponse(gg.read_json(body))
-
+        if 'fast' not in body or 'censure' not in body or 'data' not in body:
+            return JsonResponse({'success': 'false', 'message': 'Invalid data'},
+                                status=401)
+        mid_point = not body['fast']
+        censor = body['censure']
+        return JsonResponse(
+            gg.read_json(body['data'], censor=censor, middlest_point=mid_point))
 
     def head(self, request, *args, **kwargs):
         return JsonResponse(

@@ -14,3 +14,6 @@ code {
 html, body{
   background-color: #e7ecf2;
 }
+label{
+  cursor:pointer;
+}

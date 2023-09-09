@@ -59,7 +59,7 @@ export function CustomWordCloud({height, width, data}: { height: number, width: 
                 return <Text key={w.text} textAnchor={'middle'}
                              transform={`translate(${w.x}, ${w.y}) rotate(${w.rotate})`}
                     // @ts-ignore
-                             fill={color_dict[(words[i]?.sentiment || 'neutrals')][i % (color_dict[(words[i]?.sentiment || 'neutrals')].length) || 0]}
+                             fill={color_dict[(w?.sentiment || 'neutrals')][i % (color_dict[(w?.sentiment || 'neutrals')].length) || 0]}
                              fontSize={w.size} fontFamily={w.font}>{w.text}</Text>
             }
         )}
