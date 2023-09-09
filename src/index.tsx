@@ -10,7 +10,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {AdminPoll, loader as adminPollLoader} from "./AdminPoll";
 import {ArcElement} from "chart.js";
 import 'chart.js/auto';
-import {Test, loader as testLoader} from "./Test";
+import {Test} from "./Test";
 
 
 const router = createBrowserRouter([
@@ -35,7 +35,6 @@ const router = createBrowserRouter([
     {
         path: "/test/:pollId",
         element: <Test/>,
-        loader: testLoader
     }
 ])
 
