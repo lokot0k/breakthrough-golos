@@ -22,7 +22,7 @@ tspan {
     height: 90vh;
     display: flex;
     /*flex-direction: column;*/
-    background-color: #cfd4da;
+    background-color: #e7ecf2;
 }
 
 .question-holder {
@@ -32,6 +32,10 @@ tspan {
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 .1rem .5rem #656565;
+}
+
+.data-section {
+    height: auto;
 }
 
 .chart-section {
@@ -90,7 +94,7 @@ tspan {
 
 .DropdownElement {
     text-align: center;
-    margin: 15px;
+    margin: 25px 15px;
     position: relative;
 }
 
@@ -101,8 +105,23 @@ tspan {
     box-shadow: 0 .3rem .4rem #736e6e;
     padding: 10px;
     z-index: 5;
-    position: relative;
+    height: 4rem;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
 }
+
+.positives {
+    box-shadow: 0 .1rem .1rem #00910c,
+                0 .1rem 1rem rgba(0, 145, 12, 0.52);
+}
+
+.negatives {
+    box-shadow: 0 .1rem .1rem #c0103d;
+}
+
+
 
 .dropdown-content::-webkit-scrollbar {
     display: none;

@@ -2,6 +2,9 @@ import {Form} from "react-bootstrap"
 import {ChangeEventHandler, useState} from "react";
 import _, {sortBy, sumBy, words} from "lodash";
 import {Dropdown} from "./Dropdown";
+import {Sentiments} from "./utils";
+import {ParentSize} from "@visx/responsive";
+import {CustomWordCloud} from "./wordcloud";
 
 
 interface LabeledData {
@@ -15,7 +18,7 @@ export interface LabeledAnswer {
     cluster: string
     corrected: string | null | undefined
     count: number
-    sentiment: ["positives", "neutrals", "negatives"]
+    sentiment: Sentiments
 }
 
 interface WordData {
@@ -36,15 +39,6 @@ export function Test() {
             console.log(clusters)
             setData(clusters)
             setQuestion(data.question)
-
-            setWords(Object.entries(clusters).map(([cluster, answers]) =>
-                ({
-                    text: cluster,
-                    value: sumBy(answers, value => value.count),
-                    // @ts-ignore
-                    sentiment: (answers[0].sentiment === 'positives' || answers[0].sentiment === 'neutrals' || answers[0].sentiment === 'negatives') ? answers[0].sentiment : "neutrals",
-                })
-            ))
         }
     }
 
@@ -57,11 +51,11 @@ export function Test() {
             <div className="chart-section">
                 <div className="question-holder">{question}</div>
                 <div className="data-section">
-                    <Dropdown data={data}/>
-                    {/*{!_.isEmpty(data) ? (*/}
-                    {/*    // @ts-ignore*/}
-                    {/*    <ParentSize>{({ width, height }) => <CustomWordCloud width={width} height={height} words={words} />}</ParentSize>*/}
-                    {/*) : <div/>}*/}
+                    {/*<Dropdown data={data}/>*/}
+                    {!_.isEmpty(data) ? (
+                        // @ts-ignore
+                        <ParentSize>{({ width, height }) => <CustomWordCloud width={width} height={height} data={data} />}</ParentSize>
+                    ) : <div/>}
                 </div>
             </div>
             <div className="qr-code-section">
