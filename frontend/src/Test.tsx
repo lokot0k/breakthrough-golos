@@ -10,6 +10,7 @@ import {DonughtStat} from "./Donught";
 import {HorizontalChart} from "./HorizontalChart";
 import './App.css'
 import {json} from "react-router-dom";
+import png from "./assets/logo.png";
 
 
 interface LabeledData {
@@ -69,6 +70,7 @@ export function Test() {
 
     return <div className="Test">
         <div className="header">
+            <img src={png} style={{ aspectRatio: "320/39", height:"50%", marginTop: "25px", marginLeft:"25px"}}></img>
             <Form.Group controlId="formFile" className="file-loader mb-3">
                 <Form.Label>{isLoading ? "Loading..." : filename}</Form.Label>
                 <Form.Control style={({

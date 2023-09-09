@@ -174,8 +174,7 @@ class GarageModel:
                 print(clusters_pred)
 
             if not middlest_point:
-                embbbbb = self.QA_model.encode(
-                    np.hstack(np.array([[question], answers])))
+                embbbbb = self.QA_model.encode(np.hstack([np.array([question]), answers]))
                 embeddings = embbbbb[1:]
 
             df = pd.DataFrame({"answers": answers, "counts": counts,
@@ -235,7 +234,7 @@ class MlView(View):
         if 'fast' not in body or 'censure' not in body or 'data' not in body:
             return JsonResponse({'success': 'false', 'message': 'Invalid data'},
                                 status=401)
-        mid_point = not body['fast']
+        mid_point = body['fast']
         censor = body['censure']
         return JsonResponse(
             gg.read_json(body['data'], censor=censor, middlest_point=mid_point))
