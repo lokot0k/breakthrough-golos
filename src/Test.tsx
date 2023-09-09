@@ -6,6 +6,7 @@ import {Sentiments} from "./utils";
 import {ParentSize} from "@visx/responsive";
 import {CustomWordCloud} from "./wordcloud";
 import {FormControlLabel, Radio, RadioGroup} from "@mui/material";
+import {DonughtStat} from "./Donught";
 
 
 interface LabeledData {
@@ -40,7 +41,7 @@ export function Test() {
             const text = await file.text();
             const data: LabeledData = JSON.parse(text)
             const clusters = _.groupBy(data.answers, 'cluster')
-            console.log(clusters)
+            //console.log(clusters)
             setData(clusters)
             setQuestion(data.question)
         } else {
@@ -68,15 +69,16 @@ export function Test() {
                             : "wc" === demoType && !_.isEmpty(data) ?
                                 <ParentSize>{({width, height}) => <CustomWordCloud width={width} height={height}
                                                                                    data={data}/>}</ParentSize>
-                            : <div/>
+                            : "dn" === demoType ?  <DonughtStat  results={data}/> :<div/>
                     }
                 </div>
             </div>
             <div className="qr-code-section">
-                <RadioGroup value={demoType} defaultValue="dd" onChange={(event, value) => setDemoType(value)}>
-                    <FormControlLabel control={<Radio/>} label="Dropdown" value="dd"/>
-                    <FormControlLabel control={<Radio/>} label="Wordcloud" value="wc"/>
-                </RadioGroup>
+                    <RadioGroup value={demoType} defaultValue="dd" onChange={(event, value) => setDemoType(value)}>
+                        <FormControlLabel control={<Radio/>} label="Dropdown" value="dd"/>
+                        <FormControlLabel control={<Radio/>} label="Wordcloud" value="wc"/>
+                        <FormControlLabel control={<Radio />} label="Donught" value="dn" />
+                    </RadioGroup>
             </div>
         </div>
     </div>
