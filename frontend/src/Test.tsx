@@ -5,10 +5,11 @@ import {Dropdown} from "./Dropdown";
 import {Sentiments} from "./utils";
 import {ParentSize} from "@visx/responsive";
 import {CustomWordCloud} from "./wordcloud";
-import {FormControlLabel, Radio, RadioGroup} from "@mui/material";
+import {FormControlLabel, Radio, RadioGroup, Switch, ToggleButton} from "@mui/material";
 import {DonughtStat} from "./Donught";
 import {HorizontalChart} from "./HorizontalChart";
 import './App.css'
+import {json} from "react-router-dom";
 
 
 interface LabeledData {
@@ -31,6 +32,8 @@ interface WordData {
 }
 
 export function Test() {
+    const [censure, setCensure] = useState(false);
+    const [fast, setFast] = useState(false);
     const [filename, setFilename] = useState("Загрузить файл");
     const [demoType, setDemoType] = useState("dd");
     const [question, setQuestion] = useState("Выберите файл...");
@@ -46,8 +49,12 @@ export function Test() {
             const response = await fetch("/api/do_good/", {
                 method: "POST",
                 //mode: 'no-cors',
-                headers: { "Content-Type": "application/json" },
-                body: text
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    censure,
+                    fast,
+                    data: JSON.parse(text)
+                })
             })
             const data: LabeledData = await response.json()
             const clusters = _.groupBy(data.answers, 'cluster')
@@ -93,6 +100,10 @@ export function Test() {
                 </div>
             </div>
             <div className="qr-code-section">
+                <FormControlLabel value={censure} onChange={(event, checked) => setCensure(checked)} control={<Switch/>}
+                                  label={"Цензура"}/>
+                <FormControlLabel value={fast} onChange={(event, checked) => setFast(checked)} control={<Switch/>}
+                                  label={"Быстрее (но хуже)"}/>
                 <RadioGroup value={demoType} defaultValue="dd" onChange={(event, value) => setDemoType(value)}>
                     <FormControlLabel control={<Radio/>} label="Dropdown" value="dd"/>
                     <FormControlLabel control={<Radio/>} label="Wordcloud" value="wc"/>
