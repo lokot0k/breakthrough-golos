@@ -7,7 +7,9 @@ from django.views import View
 from sklearn.cluster import AgglomerativeClustering
 from sentence_transformers import SentenceTransformer
 
-from transformers import GPT2Tokenizer, GPT2LMHeadModel, AutoTokenizer
+from transformers import GPT2Tokenizer, GPT2LMHeadModel, AutoTokenizer, \
+    AutoModelForSequenceClassification, BertTokenizer, \
+    BertForSequenceClassification
 import math
 import torch
 
