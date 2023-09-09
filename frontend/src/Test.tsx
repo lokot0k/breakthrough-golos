@@ -5,10 +5,14 @@ import {Dropdown} from "./Dropdown";
 import {Sentiments} from "./utils";
 import {ParentSize} from "@visx/responsive";
 import {CustomWordCloud} from "./wordcloud";
-import {FormControlLabel, Radio, RadioGroup, Switch, ToggleButton} from "@mui/material";
+import {FormControl, FormControlLabel, Radio, RadioGroup, Switch, ToggleButton} from "@mui/material";
 import {DonughtStat} from "./Donught";
 import {HorizontalChart} from "./HorizontalChart";
 import './App.css'
+import donught from './assets/donught.svg'
+import dropdown from './assets/dropdown.svg'
+import horizontalChart from './assets/horizontal_chart.svg'
+import wordCloud from './assets/word_cloud.svg'
 import {json} from "react-router-dom";
 
 
@@ -105,7 +109,7 @@ export function Test() {
                 <FormControlLabel value={fast} onChange={(event, checked) => setFast(checked)} control={<Switch/>}
                                   label={"Быстрее (но хуже)"}/>
                 <RadioGroup value={demoType} defaultValue="dd" onChange={(event, value) => setDemoType(value)}>
-                    <FormControlLabel control={<Radio/>} label="Dropdown" value="dd"/>
+                    <FormControlLabel control={<Radio/>} label={<img src={"/favicon.ico"}/>} value="dd"/>
                     <FormControlLabel control={<Radio/>} label="Wordcloud" value="wc"/>
                     <FormControlLabel control={<Radio/>} label="Hortizontal Chart" value="hc"/>
                     <FormControlLabel control={<Radio/>} label="Donught" value="dn"/>
