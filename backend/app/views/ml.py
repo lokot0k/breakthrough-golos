@@ -11,9 +11,8 @@ from transformers import GPT2Tokenizer, GPT2LMHeadModel, AutoTokenizer
 import math
 import torch
 
-from fastDamerauLevenshtein import damerauLevenshtein
 from spellchecker import SpellChecker
-
+from fastDamerauLevenshtein import damerauLevenshtein
 
 class GarageModel:
     def __init__(self):

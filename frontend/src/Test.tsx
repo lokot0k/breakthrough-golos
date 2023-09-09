@@ -42,8 +42,9 @@ export function Test() {
             setFilename(file.name)
             setLoading(true)
             const text = await file.text();
-            const response = await fetch("/api/do_good", {
+            const response = await fetch("/api/do_good/", {
                 method: "POST",
+                //mode: 'no-cors',
                 headers: { "Content-Type": "application/json" },
                 body: text
             })

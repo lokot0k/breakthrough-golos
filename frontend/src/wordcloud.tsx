@@ -1,6 +1,5 @@
 import {Wordcloud} from "@visx/wordcloud";
 import {Text} from "@visx/text";
-import {ChangeEventHandler, useState} from "react";
 import {scaleLog} from "@visx/scale";
 import _, {sumBy} from "lodash";
 
