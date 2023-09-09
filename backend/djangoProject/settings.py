@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'backend.app.apps.AppConfig',
+    'app.apps.AppConfig',
 ]
 
 MIDDLEWARE = [
@@ -45,7 +45,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
 ]
 
-ROOT_URLCONF = 'backend.djangoProject.urls'
+ROOT_URLCONF = 'djangoProject.urls'
 
 TEMPLATES = [
     {
