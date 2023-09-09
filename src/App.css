@@ -7,9 +7,8 @@ tspan {
 
 .neon-text {
     color: #fff;
-    text-shadow:
-            0 0 3px #fff,
-            0 0 5px rgba(188, 19, 254, 0.24);
+    text-shadow: 0 0 3px #fff,
+    0 0 5px rgba(188, 19, 254, 0.24);
 }
 
 .App {
@@ -163,4 +162,54 @@ tspan {
 .Chart {
     color: white;
     padding: 50px;
+}
+
+.Dropdown {
+    color: white;
+}
+
+.Dropdown > ul {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 0;
+}
+
+.Dropdown > ul > li {
+    list-style: none;
+    flex: 0 0 33.33333%
+}
+
+.DropdownElement {
+    text-align: center;
+    margin: 15px;
+    padding: 10px;
+    border: white 2px solid;
+    position: relative;
+}
+
+.dropdown-content {
+    /*display: none;*/
+    visibility: hidden;
+    margin-left: -12px;
+    margin-top: 2px;
+    position: absolute;
+    width: 100%;
+    background-color: #3f3f3f;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    top: 0;
+}
+
+.DropdownElement:hover .dropdown-content {
+    visibility: visible;
+    top: 100%;
+    transition: all .5s, background 2s .5s linear;
+}
+
+.dropdown-content > ul {
+    padding-left: 0;
+}
+
+.dropdown-content > ul > li {
+    list-style: none;
 }

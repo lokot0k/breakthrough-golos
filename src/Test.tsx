@@ -7,6 +7,7 @@ import _, {sortBy, sumBy, words} from "lodash";
 import {Wordcloud} from "@visx/wordcloud";
 import {Text} from "@visx/text"
 import {scaleLog} from "@visx/scale";
+import {Dropdown} from "./Dropdown";
 
 interface WordData {
     text: string;
@@ -77,42 +78,23 @@ export function Test() {
     const {question} = useLoaderData() as { question: AdminQuestion }
     return <div className="AdminPoll">
         <div className="chart-section">
-            {!_.isEmpty(data) ? (
-                <Wordcloud width={1024} height={512} words={words}
-                           fontSize={fontSizeSetter}
-                           font={"Inter"}
-                           rotate={0}
-                           spiral="archimedean"
-                           padding={2}
-                           random={() => 0.5}>
-                    {(cloudWords) => cloudWords.map((w, i) => (
-                        <Text className="neon-text" key={w.text} textAnchor={'middle'}
-                              transform={`translate(${w.x}, ${w.y}) rotate(${w.rotate})`}
-                              fill="#ffffff"
-                              fontSize={w.size} fontFamily={w.font}>{w.text}</Text>
-                    ))}
-                </Wordcloud>
-            ) : <div/>}
-            {/*{sortBy(Object.entries(data), value => -value[1].length).slice(0, 5).map(currentData => (*/}
-            {/*    <Wordcloud key={currentData[0]} width={512} height={512} words={(() => {*/}
-            {/*        const [main, answers] = currentData*/}
-
-            {/*        return answers.map(value => {*/}
-            {/*            return {*/}
-            {/*                text: value.answer,*/}
-            {/*                value: (value.count + (value.answer === main ? 1 : 0)) * 1000*/}
-            {/*            }*/}
-            {/*        })*/}
-            {/*    })()}*/}
-            {/*               rotate={0}>*/}
+            <Dropdown/>
+            {/*{!_.isEmpty(data) ? (*/}
+            {/*    <Wordcloud width={1024} height={512} words={words}*/}
+            {/*               fontSize={fontSizeSetter}*/}
+            {/*               font={"Inter"}*/}
+            {/*               rotate={0}*/}
+            {/*               spiral="archimedean"*/}
+            {/*               padding={2}*/}
+            {/*               random={() => 0.5}>*/}
             {/*        {(cloudWords) => cloudWords.map((w, i) => (*/}
-            {/*            <Text key={w.text} textAnchor={'middle'}*/}
+            {/*            <Text className="neon-text" key={w.text} textAnchor={'middle'}*/}
             {/*                  transform={`translate(${w.x}, ${w.y}) rotate(${w.rotate})`}*/}
             {/*                  fill="#ffffff"*/}
             {/*                  fontSize={w.size} fontFamily={w.font}>{w.text}</Text>*/}
             {/*        ))}*/}
             {/*    </Wordcloud>*/}
-            {/*))}*/}
+            {/*) : <div/>}*/}
         </div>
         <div className="qr-code-section">
             <Form.Group controlId="formFile" className="mb-3">
