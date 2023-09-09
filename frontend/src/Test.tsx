@@ -58,7 +58,7 @@ export function Test() {
             method: "POST",
             //mode: 'no-cors',
             headers: {"Content-Type": "application/json"},
-            body: '{' + '"censure": '+ censure+", "+'"fast": '+fast+", "+'"data": ' + jsonTxt+'}'
+            body: '{' + '"censure": '+ censure+", "+'"fast": '+fast+', "correction": ' + correction +', "data": ' + jsonTxt+'}'
 
         })
         if(!response.ok){
@@ -125,16 +125,25 @@ export function Test() {
                 <div className="settings-container">
                     <h1>Отображение</h1>
                     <FormControlLabel labelPlacement={"start"} value={censure}
-                                      onChange={(event, checked) => setCensure(checked)} control={<Switch/>}
+                                      onChange={(event, checked) => {
+                                          setCensure(checked)
+                                          makeRequest().then(r => {})
+                                      }} control={<Switch/>}
                                       label={"Цензура"}/>
                     <br/>
                     <FormControlLabel labelPlacement={"start"} value={fast}
-                                      onChange={(event, checked) => setFast(checked)}
+                                      onChange={(event, checked) => {
+                                          setFast(checked)
+                                          makeRequest().then(r => {})
+                                      }}
                                       control={<Switch/>}
                                       label={"Быстрее (но хуже)"}/>
                     <br/>
                     <FormControlLabel labelPlacement={"start"} value={correction}
-                                      onChange={(event, checked) => setCorrection(checked)}
+                                      onChange={(event, checked) => {
+                                          setCorrection(checked)
+                                          makeRequest().then(r => {})
+                                      }}
                                       control={<Switch/>}
                                       label={"Автокоррекция"}/>
                     <RadioGroup className={"radio-demo-type-group"} value={demoType} defaultValue="dd"
