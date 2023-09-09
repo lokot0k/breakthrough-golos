@@ -42,7 +42,12 @@ export function Test() {
             setFilename(file.name)
             setLoading(true)
             const text = await file.text();
-            const data: LabeledData = JSON.parse(text)
+            const response = await fetch("/api/do_good", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: text
+            })
+            const data: LabeledData = await response.json()
             const clusters = _.groupBy(data.answers, 'cluster')
             setData(clusters)
             setQuestion(data.question)
