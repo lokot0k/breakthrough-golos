@@ -14,6 +14,7 @@ import dropdown from './assets/dropdown.svg'
 import horizontalChart from './assets/horizontal_chart.svg'
 import wordCloud from './assets/word_cloud.svg'
 import {json} from "react-router-dom";
+import png from "./assets/logo.png";
 
 
 interface LabeledData {
@@ -73,6 +74,7 @@ export function Test() {
 
     return <div className="Test">
         <div className="header">
+            <img src={png} style={{ aspectRatio: "320/39", height:"50%", marginTop: "25px", marginLeft:"25px"}}></img>
             <Form.Group controlId="formFile" className="file-loader mb-3">
                 <Form.Label>{isLoading ? "Loading..." : filename}</Form.Label>
                 <Form.Control style={({
