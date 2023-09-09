@@ -9,6 +9,7 @@ import {Text} from "@visx/text"
 import {scaleLog} from "@visx/scale";
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import {CustomWordCloud} from "./wordcloud";
+import {HorizontalChart} from "./HorizontalChart";
 
 interface AdminQuestion {
     id: string
@@ -76,7 +77,8 @@ export function Test() {
         <div className="chart-section">
             {!_.isEmpty(data) ? (
                 // @ts-ignore
-                <ParentSize>{({ width, height }) => <CustomWordCloud width={width} height={height} words={words} />}</ParentSize>
+                //<ParentSize>{({ width, height }) => <CustomWordCloud width={width} height={height} words={words} />}</ParentSize>
+                <ParentSize>{({ width, height }) => <HorizontalChart width={width} height={height} words={words} />}</ParentSize>
             ) : <div/>}
             {/*{sortBy(Object.entries(data), value => -value[1].length).slice(0, 5).map(currentData => (*/}
             {/*    <Wordcloud key={currentData[0]} width={512} height={512} words={(() => {*/}
