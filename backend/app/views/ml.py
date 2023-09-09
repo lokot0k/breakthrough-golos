@@ -20,12 +20,18 @@ class GarageModel:
         self.model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
         self.cluster_model = AgglomerativeClustering(metric="cosine", linkage="average", n_clusters=None, distance_threshold=0.33)
 
-
-        self.tokenizer = GPT2Tokenizer.from_pretrained("sberbank-ai/rugpt3small_based_on_gpt2")
-        self.gpt3_large = GPT2LMHeadModel.from_pretrained("sberbank-ai/rugpt3small_based_on_gpt2")
-
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.gpt3_large = self.gpt3_large.to(self.device)
+
+        self.sent_tokenizer = AutoTokenizer.from_pretrained('cointegrated/rubert-tiny-sentiment-balanced')
+        self.sent_model = AutoModelForSequenceClassification.from_pretrained('cointegrated/rubert-tiny-sentiment-balanced')
+
+
+        self.toxic_tokenizer = BertTokenizer.from_pretrained('SkolkovoInstitute/russian_toxicity_classifier')
+        self.toxic_model = BertForSequenceClassification.from_pretrained('SkolkovoInstitute/russian_toxicity_classifier')
+
+        if torch.cuda.is_available():
+            self.sent_model.cuda()
+            self.toxic_model.cuda()
 
         # Загрузка фильтра "плохих" слов
         self.bad_words = []
@@ -48,7 +54,10 @@ class GarageModel:
 
     def preprocess(self, text: str, censor=True, check_spelling=False):
         txt = self.correct(self.clean(text)) if check_spelling else self.clean(text)
-        return self.check_text(txt) if censor else txt
+        if censor:
+            if self.get_is_toxic(txt):
+                txt = "***"
+        return txt
 
 
     def check_text(self, text):
@@ -69,6 +78,22 @@ class GarageModel:
         for i in to_remove:
             text = text.replace(i, "")
         return text
+
+
+    def get_sentiment(self, text):
+        with torch.no_grad():
+            inputs = self.sent_tokenizer(text, return_tensors='pt', truncation=True, padding=True).to(self.sent_model.device)
+            proba = torch.sigmoid(self.sent_model(**inputs).logits).cpu().numpy()
+        res = proba.dot([-1, 0, 1])
+        tresh = 0.33
+        res[res>tresh] = 1
+        res[res<-tresh] = -1
+        res[(res>=-tresh)*(res<=tresh)] = 0
+        return res
+
+    def get_is_toxic(self, text):
+        batch = self.toxic_tokenizer.encode(text, return_tensors='pt')
+        return np.argmax(self.toxic_model(batch).logits.detach().numpy())==1
 
     def replace_english_letters(self, text):
         replacements = {
@@ -91,58 +116,21 @@ class GarageModel:
 
         return text
 
-    def is_bad_word(self, source, dist):
-        current_percent = 0.99
-        for word in source:
-            #print(word if word == dist else "")
-            ratio = damerauLevenshtein(dist, word)
-            ratio = 1.0 if word in dist else ratio
-            if ratio >= current_percent:
-                return True, ratio
-
-        return False, ratio
-
-
     def get_middlest_word(self, ans_emb, words): # для одного кластера
         middle_point = ((ans_emb.sum(axis=0))/len(ans_emb)).reshape(1, -1)
         dist = np.linalg.norm(ans_emb-middle_point, axis=1)
         return words[np.argmin(dist)]
 
 
-    def calculate_perplexity(self, sentence, model, tokenizer): # todo добавить векторизацию
-        sentence_positive = 'довольна '+ sentence.lower()
-        sentence_negative = 'недовольна '+ sentence.lower()
-        list_sent = [sentence_positive, sentence_negative]
-        ppl_values = []
-
-        for sentence in list_sent:
-            encodings = tokenizer(sentence, return_tensors='pt')
-            input_ids = encodings.input_ids.to(self.device)
-            with torch.no_grad():
-                outputs = self.gpt3_large(input_ids=input_ids, labels=input_ids)
-            loss = outputs.loss
-            ppl = math.exp(loss.item() * input_ids.size(1))
-            ppl_values.append(ppl)
-        # print(ppl_values[0] / ppl_values[1], ppl_values[0], ppl_values[1])
-        if ppl_values[0] / ppl_values[1] > 1.2:
-            return -1
-        elif ppl_values[0] / ppl_values[1] < 0.8:
-            return 1
-        else:
-            return 0
-
     def read_json(self, parsed_json, censor=False, check_spelling=False,
                   show_prints=False):
         word2vec_model = self.model
         cluster_model = self.cluster_model
-        sentiment_tokenizer = self.tokenizer
-        classification_model = self.gpt3_large
 
         question_id = parsed_json["id"]
         question = parsed_json["question"]
         answers = []
         counts = []
-        sentiment = []
         corrected = []
         for answer_item in parsed_json["answers"]:
             answers.append(answer_item["answer"])
@@ -150,9 +138,7 @@ class GarageModel:
             corrected.append(
                 self.preprocess(answers[-1], censor, check_spelling))
             counts.append(answer_item["count"])
-            sentiment.append(1)
-
-            # sentiment.append(self.calculate_perplexity(corrected[-1], gpt3_large, tokenizer))
+        sentiment = self.get_sentiment(answers)
         if show_prints:
             print(corrected)
             print(counts)

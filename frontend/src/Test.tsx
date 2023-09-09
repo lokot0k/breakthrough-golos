@@ -8,6 +8,7 @@ import {CustomWordCloud} from "./wordcloud";
 import {FormControlLabel, Radio, RadioGroup} from "@mui/material";
 import {DonughtStat} from "./Donught";
 import {HorizontalChart} from "./HorizontalChart";
+import './App.css'
 
 
 interface LabeledData {
