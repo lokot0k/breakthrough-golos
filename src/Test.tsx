@@ -7,11 +7,8 @@ import _, {sortBy, sumBy, words} from "lodash";
 import {Wordcloud} from "@visx/wordcloud";
 import {Text} from "@visx/text"
 import {scaleLog} from "@visx/scale";
-
-interface WordData {
-    text: string;
-    value: number;
-}
+import ParentSize from '@visx/responsive/lib/components/ParentSize';
+import {CustomWordCloud} from "./wordcloud";
 
 interface AdminQuestion {
     id: string
@@ -45,17 +42,14 @@ interface LabeledAnswer {
     count: number
     sentiment: ["positives", "neutrals", "negatives"]
 }
+interface WordData {
+    text: string;
+    value: number;
+}
 
 export function Test() {
     const [data, setData] = useState({} as _.Dictionary<LabeledAnswer[]>);
     const [words, setWords] = useState([] as WordData[]);
-
-    const fontScale = scaleLog({
-        domain: [Math.min(...words.map((w) => w.value)), Math.max(...words.map((w) => w.value))],
-        range: [10, 100],
-    });
-    const fontSizeSetter = (datum: WordData) => fontScale(datum.value);
-
     const handleFile: ChangeEventHandler<HTMLInputElement> = async event => {
         if (event.target.files && event.target.files.length) {
             const file = event.target.files[0]
@@ -68,30 +62,21 @@ export function Test() {
             setWords(Object.entries(clusters).map(([cluster, answers]) =>
                 ({
                     text: cluster,
-                    value: sumBy(answers, value => value.count) * 1000
+                    value: sumBy(answers, value => value.count),
+                    // @ts-ignore
+                    sentiment: (answers[0].sentiment === 'positives' || answers[0].sentiment === 'neutrals' || answers[0].sentiment === 'negatives') ? answers[0].sentiment : "neutrals",
                 })
             ))
         }
     }
-
     const {question} = useLoaderData() as { question: AdminQuestion }
+
+
     return <div className="AdminPoll">
         <div className="chart-section">
             {!_.isEmpty(data) ? (
-                <Wordcloud width={1024} height={512} words={words}
-                           fontSize={fontSizeSetter}
-                           font={"Inter"}
-                           rotate={0}
-                           spiral="archimedean"
-                           padding={2}
-                           random={() => 0.5}>
-                    {(cloudWords) => cloudWords.map((w, i) => (
-                        <Text className="neon-text" key={w.text} textAnchor={'middle'}
-                              transform={`translate(${w.x}, ${w.y}) rotate(${w.rotate})`}
-                              fill="#ffffff"
-                              fontSize={w.size} fontFamily={w.font}>{w.text}</Text>
-                    ))}
-                </Wordcloud>
+                // @ts-ignore
+                <ParentSize>{({ width, height }) => <CustomWordCloud width={width} height={height} words={words} />}</ParentSize>
             ) : <div/>}
             {/*{sortBy(Object.entries(data), value => -value[1].length).slice(0, 5).map(currentData => (*/}
             {/*    <Wordcloud key={currentData[0]} width={512} height={512} words={(() => {*/}
