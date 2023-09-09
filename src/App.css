@@ -5,6 +5,19 @@ tspan {
     text-shadow: #282c34;
 }
 
+::-webkit-scrollbar {
+    width: 1em;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+}
+
 .neon-text {
     color: #fff;
     text-shadow: 0 0 3px #fff,
@@ -206,7 +219,7 @@ tspan {
     /*overflow: hidden;*/
 }
 .DropdownElement:hover .dropdown-content {
-    max-height: 100px;
+    max-height: 240px;
     visibility: visible;
 }
 
@@ -216,4 +229,5 @@ tspan {
 
 .dropdown-content > ul > li {
     list-style: none;
+    padding: 5px 0;
 }
