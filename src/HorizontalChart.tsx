@@ -1,11 +1,21 @@
-import _ from "lodash";
-import { Bar } from "react-chartjs-2";
+import _, {sumBy} from "lodash";
+import {Bar} from "react-chartjs-2";
 import {ChartData} from "chart.js";
-// @ts-ignore
-export function HorizontalChart({height, width, words}) {
+import {LabeledAnswer} from "./Test";
+
+export function HorizontalChart({height, width, data}: { height: number, width: number, data: _.Dictionary<LabeledAnswer[]> }) {
+    const words = Object.entries(data).map(([cluster, answers]) =>
+        ({
+            text: cluster,
+            value: sumBy(answers, value => value.count),
+            // @ts-ignore
+            sentiment: (answers[0].sentiment === 'positives' || answers[0].sentiment === 'neutrals' || answers[0].sentiment === 'negatives') ? answers[0].sentiment : "neutrals",
+        })
+    )
+
     const sortedWords = _.sortBy(words, (w) => w.value);
     _.reverse(sortedWords);
-    const data: ChartData = {
+    const chartData: ChartData = {
         labels: sortedWords.map((w) => w.text),
         datasets: [
             {
@@ -36,14 +46,15 @@ export function HorizontalChart({height, width, words}) {
         }
     }
     // @ts-ignore
-    return <Bar data={data} options={{
+    return <Bar data={chartData} options={{
         indexAxis: 'y',
-        plugins:{
+        plugins: {
             legend: {display: false},
             title: {
                 display: true,
                 text: 'График ответов'
             }
-        }}}> </Bar>
+        }
+    }}> </Bar>
 
 }

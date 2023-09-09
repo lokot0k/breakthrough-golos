@@ -5,7 +5,7 @@ import {Sentiments} from "./utils";
 type Cluster = [string, string[], Sentiments];
 
 function DropdownElement({ cluster }: { cluster: Cluster }) {
-    return <div className="DropdownElement">
+    return <div className={`DropdownElement${cluster[1].length == 1 ? " solo" : ""}`}>
         <div className={`dropdown-label ${cluster[2]}`}>
             {`${cluster[0]}${cluster[1].length > 1 ? ` (x${cluster[1].length})` : ''}`}
         </div>

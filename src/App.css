@@ -37,6 +37,7 @@ tspan {
 .data-section {
     height: 60vh;
     margin-top: 15px;
+    padding: 20px;
 }
 
 .chart-section {
@@ -94,7 +95,7 @@ tspan {
     transition: all .5s;
 }
 
-.DropdownElement:hover .dropdown-label {
+.DropdownElement:hover:not(.solo) .dropdown-label {
     box-shadow: none;
     transition: all .5s;
 }
@@ -135,7 +136,7 @@ tspan {
     max-height: 0;
 }
 
-.DropdownElement:hover .dropdown-content {
+.DropdownElement:hover:not(.solo) .dropdown-content {
     max-height: 234px;
     visibility: visible;
 }
@@ -171,4 +172,34 @@ tspan {
     padding: 7px;
     border-radius: 5px;
     color: white;
+}
+
+.progress-bar {
+    position: relative;
+    width: 500px;
+    height: 500px;
+}
+
+.circle {
+    height: 100%;
+    right: 0px;
+    position: absolute;
+    border: solid 15px  #a9a9a9;
+    border-top-color: #9cff00;
+    border-radius: 50%;
+}
+
+.circle-border {
+    width: 100%;
+    transform: rotate(135deg);
+    -webkit-animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
