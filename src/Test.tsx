@@ -28,6 +28,7 @@ interface WordData {
 }
 
 export function Test() {
+    const [filename, setFilename] = useState("Загрузить файл");
     const [demoType, setDemoType] = useState("dd");
     const [question, setQuestion] = useState("Выберите файл...");
     const [data, setData] = useState({} as _.Dictionary<LabeledAnswer[]>);
@@ -35,19 +36,27 @@ export function Test() {
     const handleFile: ChangeEventHandler<HTMLInputElement> = async event => {
         if (event.target.files && event.target.files.length) {
             const file = event.target.files[0]
+            setFilename(file.name)
             const text = await file.text();
             const data: LabeledData = JSON.parse(text)
             const clusters = _.groupBy(data.answers, 'cluster')
             console.log(clusters)
             setData(clusters)
             setQuestion(data.question)
+        } else {
+            setFilename("Загрузить файл")
         }
     }
 
 
     return <div className="Test">
         <div className="header">
-
+            <Form.Group controlId="formFile" className="file-loader mb-3">
+                <Form.Label>{filename}</Form.Label>
+                <Form.Control style={({
+                    display: "none"
+                })} type="file" onChange={handleFile} />
+            </Form.Group>
         </div>
         <div className="body">
             <div className="chart-section">
@@ -64,14 +73,10 @@ export function Test() {
                 </div>
             </div>
             <div className="qr-code-section">
-                <Form.Group controlId="formFile" className="mb-3">
-                    <Form.Label>Default file input example</Form.Label>
-                    <Form.Control type="file" onChange={handleFile}/>
-                    <RadioGroup value={demoType} defaultValue="dd" onChange={(event, value) => setDemoType(value)}>
-                        <FormControlLabel control={<Radio/>} label="Dropdown" value="dd"/>
-                        <FormControlLabel control={<Radio/>} label="Wordcloud" value="wc"/>
-                    </RadioGroup>
-                </Form.Group>
+                <RadioGroup value={demoType} defaultValue="dd" onChange={(event, value) => setDemoType(value)}>
+                    <FormControlLabel control={<Radio/>} label="Dropdown" value="dd"/>
+                    <FormControlLabel control={<Radio/>} label="Wordcloud" value="wc"/>
+                </RadioGroup>
             </div>
         </div>
     </div>

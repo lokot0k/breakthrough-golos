@@ -83,7 +83,7 @@ tspan {
     background: #ffffff;
     border: white 2px solid;
     border-radius: 10px;
-    box-shadow: 0 .3rem .4rem #788AA3;
+    box-shadow: .1rem .1rem .1rem #788AA3;
     padding: 10px;
     z-index: 5;
     height: 4rem;
@@ -91,15 +91,22 @@ tspan {
     text-align: center;
     justify-content: center;
     align-items: center;
+    transition: all .5s;
+}
+
+.DropdownElement:hover .dropdown-label {
+    box-shadow: none;
+    transition: all .5s;
 }
 
 .positives {
-    box-shadow: 0 .1rem .1rem #6DA34D,
-    0 .1rem 1rem #6DA34D
+    box-shadow: .1rem .1rem .1rem #6DA34D;
+    /*0 .1rem 1rem #6DA34D;*/
 }
 
 .negatives {
-    box-shadow: 0 .1rem .1rem #c0103d;
+    box-shadow: .1rem .1rem .1rem #BF211E;
+    /*0 .1rem 1rem #c0103d;*/
 }
 
 
@@ -124,7 +131,7 @@ tspan {
 
 
     visibility: hidden;
-    transition: visibility .5s, max-height .5s;
+    transition: visibility .4s, max-height .5s;
     max-height: 0;
 }
 
@@ -154,3 +161,14 @@ tspan {
     border-top: 1px #7a7a7a solid;
 }
 
+.file-loader {
+    float: right;
+    margin: 25px;
+}
+
+.file-loader > label {
+    background: #788AA3;
+    padding: 7px;
+    border-radius: 5px;
+    color: white;
+}
