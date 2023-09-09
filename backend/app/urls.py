@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import poll, IPPoll, ml
+from .views import ml
 
 urlpatterns = [
     # path('', views.index, name="index"),

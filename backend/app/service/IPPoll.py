@@ -1,4 +1,4 @@
-from ..models import IPPoll, poll
+from ..models import IPPoll
 
 
 def dump_by_url(uuid: str):
