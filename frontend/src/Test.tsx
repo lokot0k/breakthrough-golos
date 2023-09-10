@@ -1,5 +1,5 @@
 import {Form} from "react-bootstrap"
-import {ChangeEventHandler, useState} from "react";
+import {ChangeEventHandler, useEffect, useState} from "react";
 import _, {sortBy, sumBy, words} from "lodash";
 import {Dropdown} from "./Dropdown";
 import {Sentiments} from "./utils";
@@ -35,7 +35,6 @@ interface WordData {
     text: string;
     value: number;
 }
-let jsonTxt = "";
 
 export function Test() {
     const [censure, setCensure] = useState(false);
@@ -47,18 +46,20 @@ export function Test() {
     const [isLoading, setLoading] = useState(false)
     const [data, setData] = useState({} as _.Dictionary<LabeledAnswer[]>);
     const [words, setWords] = useState([] as WordData[]);
-
+    const [json, setJson] = useState("");
     const makeRequest = async ()=>{
-        if(jsonTxt === ""){
+        if(json === ""){
             return
         }
         setLoading(true)
-        console.log('{' + '"censure": '+ censure+", "+'"fast": '+fast+", "+'"data": ' + jsonTxt+'}')
+        console.log("Loading json")
+        setQuestion("Загрузка...")
+        // console.log('{' + '"censure": '+ censure+", "+'"fast": '+fast+", "+'"data": ' + json+'}')
         const response = await fetch("/api/do_good/", {
             method: "POST",
             //mode: 'no-cors',
             headers: {"Content-Type": "application/json"},
-            body: '{' + '"censure": '+ censure+", "+'"fast": '+fast+', "correction": ' + correction +', "data": ' + jsonTxt+'}'
+            body: '{' + '"censure": '+ censure+", "+'"fast": '+fast+', "correction": ' + correction +', "data": ' + json+'}'
 
         })
         if(!response.ok){
@@ -71,6 +72,11 @@ export function Test() {
         setQuestion(data.question)
         setLoading(false)
     }
+
+    useEffect(() => {
+        makeRequest().then(r => {})
+    }, [json, correction, censure, fast]);
+
     const handleFile: ChangeEventHandler<HTMLInputElement> = async event => {
         if (event.target.files && event.target.files.length) {
             const file = event.target.files[0]
@@ -79,8 +85,7 @@ export function Test() {
             replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').
             replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
                 setFilename(file.name)
-                jsonTxt = text;
-                await makeRequest();
+                setJson(text);
             }
         } else {
             setFilename("Загрузить файл")
@@ -127,22 +132,19 @@ export function Test() {
                     <FormControlLabel labelPlacement={"start"} value={censure}
                                       onChange={(event, checked) => {
                                           setCensure(checked)
-                                          makeRequest().then(r => {})
                                       }} control={<Switch/>}
                                       label={"Цензура"}/>
                     <br/>
                     <FormControlLabel labelPlacement={"start"} value={fast}
                                       onChange={(event, checked) => {
                                           setFast(checked)
-                                          makeRequest().then(r => {})
                                       }}
                                       control={<Switch/>}
-                                      label={"Быстрее (но хуже)"}/>
+                                      label={"Ускоренный процессинг"}/>
                     <br/>
                     <FormControlLabel labelPlacement={"start"} value={correction}
                                       onChange={(event, checked) => {
                                           setCorrection(checked)
-                                          makeRequest().then(r => {})
                                       }}
                                       control={<Switch/>}
                                       label={"Автокоррекция"}/>
