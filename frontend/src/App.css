@@ -22,7 +22,9 @@ tspan {
 .body {
     height: 90vh;
     display: flex;
-    /*flex-direction: column;*/
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
     background-color: #e7ecf2;
 }
 
@@ -42,7 +44,7 @@ tspan {
 }
 
 .chart-section {
-    width: 75%;
+    width: 70%;
     padding: 40px;
 }
 
@@ -243,7 +245,7 @@ label:has(span.radio-demo-type-button.Mui-checked) img {
 }
 
 .settings-container {
-    margin: 40px 40px 40px 0;
+    margin: 40px 0 40px 0;
     background: white;
     padding: 30px;
     border-radius: 10px;

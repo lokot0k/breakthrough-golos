@@ -8,10 +8,10 @@ from sklearn.cluster import AgglomerativeClustering
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from transformers import GPT2Tokenizer, GPT2LMHeadModel, AutoTokenizer, \
+from transformers import AutoTokenizer, \
     AutoModelForSequenceClassification, BertTokenizer, \
-    BertForSequenceClassification
-import math
+    BertForSequenceClassification, AutoModelForSeq2SeqLM, T5TokenizerFast
+
 import torch
 
 from spellchecker import SpellChecker
@@ -26,7 +26,7 @@ class GarageModel:
         self.cluster_model = AgglomerativeClustering(metric="cosine",
                                                      linkage="average",
                                                      n_clusters=None,
-                                                     distance_threshold=0.33)
+                                                     distance_threshold=0.25)
 
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -40,6 +40,11 @@ class GarageModel:
         self.toxic_model = BertForSequenceClassification.from_pretrained(
             'SkolkovoInstitute/russian_toxicity_classifier')
         self.QA_model = SentenceTransformer('clips/mfaq')
+        self.SC_MODEL_NAME = 'UrukHan/t5-russian-spell'
+        self.SC_MAX_INPUT = 512
+        self.sc_tokenizer = T5TokenizerFast.from_pretrained(self.SC_MODEL_NAME)
+        self.sc_model = AutoModelForSeq2SeqLM.from_pretrained(
+            self.SC_MODEL_NAME)
 
         if torch.cuda.is_available():
             self.sent_model.cuda()
@@ -53,6 +58,23 @@ class GarageModel:
         #     self.bad_words = [word.replace("\n", "").strip() for word in self.bad_words]
 
         self.spell = SpellChecker(language=['ru'])
+
+    def check_spelling(self, input_sequences: list):
+        task_prefix = "Spell correct: "
+        if type(input_sequences) != list: input_sequences = [input_sequences]
+        encoded = self.sc_tokenizer(
+            [task_prefix + sequence for sequence in input_sequences],
+            padding="longest",
+            max_length=self.SC_MAX_INPUT,
+            truncation=True,
+            return_tensors="pt",
+        )
+        # Прогнозирование
+        predicts = self.sc_model.generate(
+            **encoded.to(self.device))  # device вроде выше задан
+        # Декодируем данные
+        return self.sc_tokenizer.batch_decode(predicts,
+                                              skip_special_tokens=True)
 
     def correct(self, text):
         text_corr = ""
@@ -72,7 +94,6 @@ class GarageModel:
         return txt
 
     def check_text(self, text):
-        return text
         text = self.clean(text.lower())
         corr_text = ""
         for word in text.split(' '):
@@ -153,9 +174,13 @@ class GarageModel:
             answers.append(answer_item["answer"])
 
             corrected.append(
-                self.preprocess(answers[-1], censor, check_spelling))
+                self.preprocess(answers[-1], censor, False))
             counts.append(answer_item["count"])
         sentiment = self.get_sentiment(answers)
+        if check_spelling:
+            corrected = self.check_spelling(corrected)
+            corrected = [self.clean(i).lower() for i in corrected]
+
         if show_prints:
             print(corrected)
             print(counts)
@@ -174,7 +199,8 @@ class GarageModel:
                 print(clusters_pred)
 
             if not middlest_point:
-                embbbbb = self.QA_model.encode(np.hstack([np.array([question]), answers]))
+                embbbbb = self.QA_model.encode(
+                    np.hstack([np.array([question]), answers]))
                 embeddings = embbbbb[1:]
 
             df = pd.DataFrame({"answers": answers, "counts": counts,
@@ -236,8 +262,10 @@ class MlView(View):
                                 status=401)
         mid_point = body['fast']
         censor = body['censure']
+        autocorrect = body['correction']
         return JsonResponse(
-            gg.read_json(body['data'], censor=censor, middlest_point=mid_point))
+            gg.read_json(body['data'], censor=censor, middlest_point=mid_point,
+                         check_spelling=autocorrect))
 
     def head(self, request, *args, **kwargs):
         return JsonResponse(
